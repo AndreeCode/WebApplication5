@@ -1,0 +1,32 @@
+@model IEnumerable<WebApplication5.Models.Service>
+@{
+    ViewData["Title"] = "Servicios";
+}
+
+<h2>Servicios</h2>
+<div class="row">
+    @foreach (var s in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">@s.Title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@s.Price @s.Currency</h6>
+                    <p class="card-text">@((s.Description.Length > 150) ? s.Description.Substring(0,150) + "..." : s.Description)</p>
+                    <p class="mt-auto small text-muted">Por: @s.Owner?.FullName</p>
+                    <a asp-action="Details" asp-route-id="@s.Id" class="btn btn-primary mt-2">Ver</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<nav>
+    <ul class="pagination">
+        @{ var total = ViewBag.TotalPages as int? ?? 1; var current = ViewBag.CurrentPage as int? ?? 1; }
+        @for (int i = 1; i <= total; i++)
+        {
+            <li class="page-item @(i==current?"active":"")"><a class="page-link" asp-action="Index" asp-route-page="@i">@i</a></li>
+        }
+    </ul>
+</nav>

@@ -1,0 +1,27 @@
+@model WebApplication5.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+
+<h2>Iniciar sesión</h2>
+<form asp-action="Login" method="post" class="mt-3">
+    <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="mb-3 form-check">
+        <input asp-for="RememberMe" class="form-check-input" />
+        <label class="form-check-label">Recordarme</label>
+    </div>
+    <button class="btn btn-primary">Entrar</button>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

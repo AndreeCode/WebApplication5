@@ -1,0 +1,26 @@
+@model WebApplication5.ViewModels.ManageViewModel
+@{
+    ViewData["Title"] = "Gestionar perfil";
+}
+
+<h2>Gestionar perfil</h2>
+<form asp-action="Manage" method="post" class="mt-3">
+    <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <input asp-for="Email" class="form-control" disabled />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Nombre completo</label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Ubicación</label>
+        <input asp-for="Location" class="form-control" />
+    </div>
+    <button class="btn btn-primary">Guardar</button>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

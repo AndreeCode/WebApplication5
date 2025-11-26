@@ -1,0 +1,64 @@
+﻿@model IEnumerable<WebApplication5.Models.Service>?
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="jumbotron p-4 p-md-5 text-white rounded bg-dark">
+    <div class="col-md-6 px-0">
+        <h1 class="display-4">Encuentra y ofrece servicios cerca de ti</h1>
+        <p class="lead my-3">Busca por título, categoría, ubicación o rango de precio.</p>
+        <p class="lead mb-0"><a href="/Service/Index" class="btn btn-primary">Explorar servicios</a></p>
+    </div>
+</div>
+
+<div class="mt-4">
+    <form method="get" asp-controller="Service" asp-action="Search" class="row g-2">
+        <div class="col-md-4">
+            <input type="text" name="q" class="form-control" placeholder="Buscar..." />
+        </div>
+        <div class="col-md-2">
+            <input type="text" name="category" class="form-control" placeholder="Categoría" />
+        </div>
+        <div class="col-md-2">
+            <input type="text" name="location" class="form-control" placeholder="Ubicación" />
+        </div>
+        <div class="col-md-1">
+            <input type="number" name="minPrice" class="form-control" placeholder="Min" />
+        </div>
+        <div class="col-md-1">
+            <input type="number" name="maxPrice" class="form-control" placeholder="Max" />
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary">Buscar</button>
+        </div>
+    </form>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h3>Servicios publicados</h3>
+        <div id="servicesList" class="row">
+            @if (Model != null)
+            {
+                foreach (var s in Model)
+                {
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">@s.Title</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">@s.Price @s.Currency</h6>
+                                <p class="card-text">@((s.Description.Length > 150) ? s.Description.Substring(0,150) + "..." : s.Description)</p>
+                                <p class="mt-auto small text-muted">Por: @s.Owner?.FullName</p>
+                                <a asp-controller="Service" asp-action="Details" asp-route-id="@s.Id" class="btn btn-primary mt-2">Ver</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No hay servicios disponibles.</p>
+            }
+        </div>
+    </div>
+</div>

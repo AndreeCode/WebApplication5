@@ -1,0 +1,32 @@
+@model IEnumerable<WebApplication5.Models.Service>
+@{
+    ViewData["Title"] = "Mi Panel";
+}
+
+<h2>Mis servicios</h2>
+<p><a asp-controller="Service" asp-action="Create" class="btn btn-success">Crear nuevo servicio</a></p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Precio</th>
+            <th>Publicado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Title</td>
+                <td>@s.Price @s.Currency</td>
+                <td>@(s.IsPublished?"Sí":"No")</td>
+                <td>
+                    <a asp-controller="Service" asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-primary">Editar</a>
+                    <a asp-controller="Service" asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                    <a asp-controller="Service" asp-action="Details" asp-route-id="@s.Id" class="btn btn-sm btn-secondary">Ver</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
