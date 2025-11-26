@@ -17,7 +17,7 @@ namespace WebApplication5.Data
 
             try
             {
-                await context.Database.MigrateAsync();
+                await context.Database.MigrateAsync();//ejemplo
 
                 // Use UserManager to check for existing users to ensure Identity tables are present
                 var anyUsers = await userManager.Users.AnyAsync();
