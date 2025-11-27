@@ -4,6 +4,10 @@
 }
 
 <h2>Mis servicios</h2>
+@if(TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
 <p><a asp-controller="Service" asp-action="Create" class="btn btn-success">Crear nuevo servicio</a></p>
 <table class="table">
     <thead>
@@ -23,6 +27,11 @@
                 <td>@(s.IsPublished?"Sí":"No")</td>
                 <td>
                     <a asp-controller="Service" asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-primary">Editar</a>
+                    <form asp-controller="Service" asp-action="TogglePublish" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@s.Id" />
+                        <button type="submit" class="btn btn-sm @(s.IsPublished?"btn-warning":"btn-success")">@(s.IsPublished?"Desactivar":"Publicar")</button>
+                    </form>
                     <a asp-controller="Service" asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-danger">Eliminar</a>
                     <a asp-controller="Service" asp-action="Details" asp-route-id="@s.Id" class="btn btn-sm btn-secondary">Ver</a>
                 </td>

@@ -27,7 +27,7 @@ namespace WebApplication5.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FullName = model.FullName, Location = model.Location };
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FullName = model.FullName, Location = model.Location, PhoneNumber = model.PhoneNumber, PhoneNumberPublic = model.PhoneNumber };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
@@ -75,7 +75,7 @@ namespace WebApplication5.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
-            var model = new ManageViewModel { Email = user.Email, FullName = user.FullName, Location = user.Location };
+            var model = new ManageViewModel { Email = user.Email, FullName = user.FullName, Location = user.Location, PhoneNumberPublic = user.PhoneNumberPublic };
             return View(model);
         }
 
@@ -87,6 +87,7 @@ namespace WebApplication5.Controllers
             if (user == null) return Challenge();
             user.FullName = model.FullName;
             user.Location = model.Location;
+            user.PhoneNumberPublic = model.PhoneNumberPublic;
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {

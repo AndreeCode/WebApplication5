@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Configure DbContext and Identity
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Server=(localdb)\\mssqllocaldb;Database=MarketplaceAppDb;Trusted_Connection=True;MultipleActiveResultSets=true";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Server=(localdb)\\mssqllocaldb;Database=MarketplaceAppDb;Trusted_Connection=True;MultipleActiveResultSets=true;Encrypt=False";
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -77,6 +77,20 @@ app.MapGet("/dev/db/reset", async (ApplicationDbContext dbContext, IHostEnvironm
     dbContext.Database.EnsureDeleted();
     dbContext.Database.Migrate();
     return Results.Ok("Database reset");
+});
+
+app.MapPost("/dev/db/seed", async (IServiceProvider services, IHostEnvironment env) =>
+{
+    if (!env.IsDevelopment()) return Results.BadRequest("Not allowed");
+    try
+    {
+        await DbInitializer.SeedAsync(services);
+        return Results.Ok("Seed executed");
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
 });
 #endif
 

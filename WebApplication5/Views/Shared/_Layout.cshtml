@@ -20,9 +20,6 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Service" asp-action="Index">Servicios</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Service" asp-action="Search">Buscar</a>
-                        </li>
                     </ul>
                     <ul class="navbar-nav">
                         @if (User?.Identity?.IsAuthenticated ?? false)

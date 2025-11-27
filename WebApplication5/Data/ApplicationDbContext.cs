@@ -21,6 +21,12 @@ namespace WebApplication5.Data
                 .WithMany(u => u.Services)
                 .HasForeignKey(s => s.OwnerId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<ServiceRequest>()
+                .HasOne(r => r.Service)
+                .WithMany()
+                .HasForeignKey(r => r.ServiceId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

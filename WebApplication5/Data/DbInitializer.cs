@@ -17,36 +17,68 @@ namespace WebApplication5.Data
 
             try
             {
-                await context.Database.MigrateAsync();//ejemplo
+                await context.Database.MigrateAsync();
 
-                // Use UserManager to check for existing users to ensure Identity tables are present
-                var anyUsers = await userManager.Users.AnyAsync();
-                if (anyUsers)
+                // If users exist, assume seeded
+                if (await userManager.Users.AnyAsync())
                 {
                     logger.LogInformation("Database already seeded with users.");
-                    return; // already seeded
+                    return;
                 }
 
-                var demo = new ApplicationUser { UserName = "demo@local.test", Email = "demo@local.test", FullName = "Usuario Demo", EmailConfirmed = true };
-                var prov = new ApplicationUser { UserName = "provider@local.test", Email = "provider@local.test", FullName = "Proveedor Demo", EmailConfirmed = true };
+                // Create a single main user who will both request and offer services
+                var mainUser = new ApplicationUser
+                {
+                    UserName = "user@local.test",
+                    Email = "user@local.test",
+                    FullName = "Usuario Principal",
+                    EmailConfirmed = true,
+                    PhoneNumber = "+51910000003",
+                    PhoneNumberPublic = "+51910000003"
+                };
 
-                await userManager.CreateAsync(demo, "P@ssw0rd1");
-                await userManager.CreateAsync(prov, "P@ssw0rd1");
+                var result = await userManager.CreateAsync(mainUser, "P@ssw0rd1");
+                if (!result.Succeeded)
+                {
+                    logger.LogError("Failed to create initial user: {Errors}", string.Join(';', result.Errors.Select(e => e.Description)));
+                    throw new Exception("Failed to create seed user");
+                }
 
+                // Create services: some owned by the main user (they offer), some with no owner (third-party offers)
                 var servicesList = new List<Service>
                 {
-                    new Service { Title = "Desarrollo Web ASP.NET Core", Description = "Desarrollo de aplicaciones web con ASP.NET Core y EF Core.", Price = 1200, Currency = "PEN", Category = "Desarrollo", OwnerId = prov.Id, IsPublished = true, Location = "Lima", Keywords = "asp.net,web,desarrollo" },
-                    new Service { Title = "Diseño de Logo", Description = "Diseño profesional de logotipos y branding.", Price = 200, Currency = "PEN", Category = "Diseño", OwnerId = demo.Id, IsPublished = true, Location = "Lima", Keywords = "diseño,logo,branding" },
-                    new Service { Title = "SEO y Marketing", Description = "Optimización SEO y campañas de marketing digital.", Price = 500, Currency = "PEN", Category = "Marketing", OwnerId = prov.Id, IsPublished = true, Location = "Perú", Keywords = "seo,marketing" },
-                    new Service { Title = "Soporte Técnico", Description = "Soporte y mantenimiento de sistemas.", Price = 100, Currency = "PEN", Category = "Soporte", OwnerId = demo.Id, IsPublished = true, Location = "Lima", Keywords = "soporte,it" },
-                    new Service { Title = "Fotografía de Producto", Description = "Sesiones de fotografía para e-commerce.", Price = 300, Currency = "PEN", Category = "Fotografía", OwnerId = prov.Id, IsPublished = true, Location = "Lima", Keywords = "fotografía,producto" },
-                    new Service { Title = "Redacción de Contenido", Description = "Creación de artículos y contenidos SEO.", Price = 150, Currency = "PEN", Category = "Contenido", OwnerId = demo.Id, IsPublished = true, Location = "Remoto", Keywords = "redacción,contenido,seo" }
+                    new Service { Title = "Desarrollo Web ASP.NET Core", Description = "Desarrollo de aplicaciones web con ASP.NET Core y EF Core.", Price = 1200, Currency = "PEN", Category = "Desarrollo", OwnerId = mainUser.Id, IsPublished = true, Location = "Lima", Keywords = "asp.net,web,desarrollo" },
+                    new Service { Title = "Diseño de Logo Moderno", Description = "Diseño profesional de logotipos y branding para startups.", Price = 250, Currency = "PEN", Category = "Diseño", OwnerId = mainUser.Id, IsPublished = true, Location = "Lima", Keywords = "diseño,logo,branding" },
+                    new Service { Title = "Redacción de Contenido SEO", Description = "Creación de artículos optimizados para buscadores.", Price = 150, Currency = "PEN", Category = "Contenido", OwnerId = mainUser.Id, IsPublished = true, Location = "Remoto", Keywords = "redacción,contenido,seo" },
+
+                    // Third-party (no owner) offerings
+                    new Service { Title = "Soporte Técnico Remoto", Description = "Soporte y mantenimiento de sistemas, atención remota y on-site.", Price = 120, Currency = "PEN", Category = "Soporte", OwnerId = null, IsPublished = true, Location = "Lima", Keywords = "soporte,it,remoto" },
+                    new Service { Title = "Fotografía de Producto", Description = "Sesiones de fotografía para e-commerce y catálogo.", Price = 300, Currency = "PEN", Category = "Fotografía", OwnerId = null, IsPublished = true, Location = "Lima", Keywords = "fotografía,producto" },
+                    new Service { Title = "Gestión de Redes Sociales", Description = "Planificación y gestión de contenidos en redes sociales.", Price = 350, Currency = "PEN", Category = "Marketing", OwnerId = null, IsPublished = true, Location = "Remoto", Keywords = "social,marketing" }
                 };
 
                 context.Services.AddRange(servicesList);
                 await context.SaveChangesAsync();
 
-                logger.LogInformation("Database has been seeded.");
+                // Add a sample request from mainUser to a third-party service
+                var targetService = await context.Services.FirstOrDefaultAsync(s => s.OwnerId == null);
+                if (targetService != null)
+                {
+                    var req = new ServiceRequest
+                    {
+                        ServiceId = targetService.Id,
+                        RequesterId = mainUser.Id,
+                        RequesterName = mainUser.FullName,
+                        RequesterPhone = mainUser.PhoneNumber ?? string.Empty,
+                        RequesterEmail = mainUser.Email ?? string.Empty,
+                        Message = "Hola, estoy interesado en tu servicio. ¿Cuál es tu disponibilidad?",
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    context.ServiceRequests.Add(req);
+                    await context.SaveChangesAsync();
+                }
+
+                logger.LogInformation("Seeded 1 user and {Services} services.", servicesList.Count);
             }
             catch (Exception ex)
             {

@@ -1,23 +1,77 @@
 @model IEnumerable<WebApplication5.Models.Service>
 @{
     ViewData["Title"] = "Servicios";
+    var isSearch = (ViewBag.IsSearch as bool?) ?? false;
+    var message = ViewBag.Message as string;
+    var q = ViewBag.Query as string ?? string.Empty;
+    var category = ViewBag.Category as string ?? string.Empty;
+    var location = ViewBag.Location as string ?? string.Empty;
+    var minPrice = ViewBag.MinPrice as decimal?;
+    var maxPrice = ViewBag.MaxPrice as decimal?;
 }
 
 <h2>Servicios</h2>
+
+@if (isSearch && !string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert alert-info">@message</div>
+}
+
+<div class="mb-3">
+    <form method="get" asp-controller="Service" asp-action="Search" class="row g-2">
+        <div class="col-md-4">
+            <input type="text" name="q" class="form-control" placeholder="Buscar..." value="@q" />
+        </div>
+        <div class="col-md-2">
+            <input type="text" name="category" class="form-control" placeholder="Categoría" value="@category" />
+        </div>
+        <div class="col-md-2">
+            <input type="text" name="location" class="form-control" placeholder="Ubicación" value="@location" />
+        </div>
+        <div class="col-md-1">
+            <input type="number" name="minPrice" class="form-control" placeholder="Min" value="@(minPrice?.ToString() ?? string.Empty)" />
+        </div>
+        <div class="col-md-1">
+            <input type="number" name="maxPrice" class="form-control" placeholder="Max" value="@(maxPrice?.ToString() ?? string.Empty)" />
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary">Buscar</button>
+        </div>
+    </form>
+</div>
+
 <div class="row">
-    @foreach (var s in Model)
+    @if (Model != null && Model.Any())
     {
-        <div class="col-md-4 mb-3">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">@s.Title</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">@s.Price @s.Currency</h6>
-                    <p class="card-text">@((s.Description.Length > 150) ? s.Description.Substring(0,150) + "..." : s.Description)</p>
-                    <p class="mt-auto small text-muted">Por: @s.Owner?.FullName</p>
-                    <a asp-action="Details" asp-route-id="@s.Id" class="btn btn-primary mt-2">Ver</a>
+        foreach (var s in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">@s.Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@s.Price @s.Currency</h6>
+                        <p class="card-text">@((s.Description.Length > 150) ? s.Description.Substring(0,150) + "..." : s.Description)</p>
+                        <p class="mt-auto small text-muted">Por: @s.Owner?.FullName</p>
+                        <a asp-action="Details" asp-route-id="@s.Id" class="btn btn-primary mt-2">Ver</a>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
+    }
+    else
+    {
+        if (!isSearch)
+        {
+            <div class="col-12">
+                <p>No hay servicios publicados todavía.</p>
+            </div>
+        }
+        else
+        {
+            <div class="col-12">
+                <p>No se encontraron resultados para tu búsqueda.</p>
+            </div>
+        }
     }
 </div>
 

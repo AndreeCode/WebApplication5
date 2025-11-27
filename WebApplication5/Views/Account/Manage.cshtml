@@ -18,6 +18,11 @@
         <label class="form-label">Ubicación</label>
         <input asp-for="Location" class="form-control" />
     </div>
+    <div class="mb-3">
+        <label class="form-label">Teléfono público (se muestra cuando un usuario solicita tu servicio)</label>
+        <input asp-for="PhoneNumberPublic" class="form-control" />
+        <span asp-validation-for="PhoneNumberPublic" class="text-danger"></span>
+    </div>
     <button class="btn btn-primary">Guardar</button>
 </form>
 

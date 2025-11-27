@@ -11,5 +11,8 @@ namespace WebApplication5.ViewModels
         public string FullName { get; set; } = string.Empty;
 
         public string? Location { get; set; }
+
+        [Phone]
+        public string? PhoneNumberPublic { get; set; }
     }
 }

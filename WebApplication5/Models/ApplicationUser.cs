@@ -6,6 +6,7 @@ namespace WebApplication5.Models
     {
         public string FullName { get; set; } = string.Empty;
         public string? Location { get; set; }
+        public string? PhoneNumberPublic { get; set; }
 
         // Navigation
         public ICollection<Service>? Services { get; set; }
